@@ -172,7 +172,7 @@ To run them against Postgres instead — the tests share one database, so they
 cannot run in parallel:
 
 ```bash
-TEST_DATABASE_URL="postgres://user:pass@localhost/learnswap_test"   cargo test --test routes -- --test-threads=1
+TEST_DATABASE_URL="postgres://user:pass@localhost/learnswap_test" cargo test --test routes -- --test-threads=1
 ```
 
 Before pushing, run what CI runs:
@@ -192,6 +192,8 @@ cargo test
 - **postgres** — runs the same test suite against a real Postgres 16 service
   container. The SQLite path is covered by the `rust` job; this one proves the
   Postgres half of the `Any` driver actually works.
+- **docker** — builds the deployment image, starts the container and checks it
+  serves a real, styled page. A broken Dockerfile fails here, not on the server.
 - **css** — builds the stylesheet and fails if it comes out suspiciously small,
   which is what happens when the `@source` globs in `assets/css/input.css` stop
   matching the templates.
@@ -204,6 +206,59 @@ Both must pass before a pull request is merged.
 `assets/css/input.css`; committing it would produce a merge conflict in
 machine-generated output every time two people touch a template. Run the
 Tailwind script after pulling if styles look wrong.
+
+---
+
+## Deploying with Docker
+
+The image compiles everything inside itself, so it builds unchanged on x86-64
+and on the ARM cores of an Oracle Cloud Ampere instance. On the server, from the
+cloned repo:
+
+```bash
+git pull
+docker build -t learnswap .
+docker run -d --name learnswap --restart unless-stopped -p 80:3000 -v learnswap-data:/data learnswap
+```
+
+That serves on port 80 and keeps the SQLite database in the `learnswap-data`
+volume, so it survives rebuilds. To update: `git pull && docker build -t
+learnswap . && docker rm -f learnswap` then run again.
+
+To use Postgres instead, override one variable:
+
+```bash
+docker run -d --name learnswap --restart unless-stopped -p 80:3000 -e DATABASE_URL="postgres://user:pass@db-host/learnswap" learnswap
+```
+
+### Settings the image controls
+
+| Variable | Default in image | Notes |
+| --- | --- | --- |
+| `HOST` | `0.0.0.0` | Must stay `0.0.0.0` in a container or published ports never reach the app. Locally it defaults to `127.0.0.1`. |
+| `PORT` | `3000` | The port *inside* the container; map it with `-p`. |
+| `DATABASE_URL` | `sqlite:///data/learnswap.db?mode=rwc` | `/data` is the volume. |
+| `RUST_LOG` | `learnswap=info,tower_http=info,warn` | Raise to `debug` when something misbehaves. |
+
+### Two Oracle Cloud gotchas
+
+1. **Opening the port takes two steps.** Add an ingress rule to the subnet's
+   Security List (or Network Security Group) in the OCI console, *and* open it on
+   the instance itself — Oracle's stock images ship with restrictive local
+   firewall rules that silently drop traffic even after the console rule exists:
+   ```bash
+   sudo iptables -I INPUT 6 -m state --state NEW -p tcp --dport 80 -j ACCEPT
+   sudo netfilter-persistent save        # Ubuntu images
+   # Oracle Linux images use firewalld instead:
+   # sudo firewall-cmd --permanent --add-port=80/tcp && sudo firewall-cmd --reload
+   ```
+2. **Give the build enough memory.** Compiling from scratch is memory-hungry;
+   it is comfortable on an Ampere A1 instance but can get killed by the OOM
+   reaper on a 1 GB `E2.1.Micro`. If the build dies without an error message,
+   that is why — add swap or build on a bigger shape.
+
+The image runs as a non-root user and carries no compiler or build tooling: only
+the binary, the templates and the compiled CSS.
 
 ---
 

@@ -78,6 +78,45 @@ jobs:
           REQUIRE_POSTGRES: "1"
         run: cargo test --test routes -- --test-threads=1
 
+  docker:
+    name: Docker image
+    runs-on: ubuntu-latest
+    # Builds the deployment image and actually starts it, so a broken
+    # Dockerfile is caught here rather than on the server.
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build image
+        run: docker build -t learnswap:ci .
+
+      - name: Start the container
+        run: docker run -d --name learnswap -p 3000:3000 learnswap:ci
+
+      - name: Wait for it to answer
+        run: |
+          for _ in $(seq 1 45); do
+            if curl -fsS http://127.0.0.1:3000/health >/dev/null; then
+              echo "healthy"
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "never became healthy; container logs:"
+          docker logs learnswap
+          exit 1
+
+      - name: Check it serves a real page, styled
+        run: |
+          curl -fsS http://127.0.0.1:3000/ | grep -q "Teach one thing"
+          # Proves the Tailwind build ran inside the image, not just locally.
+          curl -fsS http://127.0.0.1:3000/assets/css/app.css | grep -q "indigo"
+          # Proves migrations ran without migrations/ being in the image.
+          curl -fsS "http://127.0.0.1:3000/browse/results?q=guitar" | grep -q "Marcus Bell"
+
+      - name: Container logs
+        if: always()
+        run: docker logs learnswap
+
   css:
     name: Tailwind build
     runs-on: ubuntu-latest

@@ -36,7 +36,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .ok()
         .and_then(|p| p.parse().ok())
         .unwrap_or(3000);
-    let addr = SocketAddr::from(([127, 0, 0, 1], port));
+    // Loopback by default so a laptop does not expose the dev server to the
+    // network. A container has to listen on 0.0.0.0 or published ports never
+    // reach it, so the Dockerfile sets HOST.
+    let host = std::env::var("HOST").unwrap_or_else(|_| "127.0.0.1".to_string());
+    let addr: SocketAddr = format!("{host}:{port}")
+        .parse()
+        .map_err(|e| format!("invalid HOST/PORT ({host}:{port}): {e}"))?;
 
     let app = router(AppState::new(store));
 

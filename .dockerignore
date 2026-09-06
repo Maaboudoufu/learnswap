@@ -1,0 +1,12 @@
+# Keep the build context small and the image reproducible: anything generated
+# locally is rebuilt inside the image.
+target/
+.git/
+.github/
+.tailwind/
+assets/css/app.css
+*.db
+*.db-shm
+*.db-wal
+.vscode/
+.idea/
