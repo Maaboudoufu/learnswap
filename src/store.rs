@@ -109,7 +109,7 @@ impl Store {
                 }
             }
         }
-        pairs.sort_by(|a, b| b.1.strength().cmp(&a.1.strength()));
+        pairs.sort_by_key(|a| std::cmp::Reverse(a.1.strength()));
         pairs.truncate(limit);
         pairs
     }
