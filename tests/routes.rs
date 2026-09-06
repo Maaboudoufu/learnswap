@@ -387,3 +387,23 @@ async fn find_by_name(store: &Store, name: &str) -> User {
         .find(|u| u.name == name)
         .unwrap_or_else(|| panic!("seed data contains {name}"))
 }
+
+/// Guards the Postgres CI job against passing vacuously.
+///
+/// Every other test passes identically on either backend, so if
+/// `TEST_DATABASE_URL` ever stopped reaching the suite the job would still go
+/// green while testing SQLite. `version()` is a Postgres function -- SQLite
+/// spells it `sqlite_version()` -- so this only succeeds on a real server.
+#[tokio::test]
+async fn the_configured_backend_is_the_one_actually_in_use() {
+    let url = std::env::var("TEST_DATABASE_URL").unwrap_or_default();
+    if !url.starts_with("postgres") {
+        return; // Default SQLite run: nothing to prove.
+    }
+    let store = seeded_store().await;
+    let version: String = sqlx::query_scalar("SELECT version()")
+        .fetch_one(store.pool())
+        .await
+        .expect("SELECT version() should work on Postgres");
+    assert!(version.contains("PostgreSQL"), "got: {version}");
+}
