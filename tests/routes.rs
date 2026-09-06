@@ -397,6 +397,17 @@ async fn find_by_name(store: &Store, name: &str) -> User {
 #[tokio::test]
 async fn the_configured_backend_is_the_one_actually_in_use() {
     let url = std::env::var("TEST_DATABASE_URL").unwrap_or_default();
+
+    // The CI Postgres job sets REQUIRE_POSTGRES so that losing TEST_DATABASE_URL
+    // fails the job instead of quietly falling back to SQLite. Without this the
+    // early return below would make that job pass while testing nothing.
+    if std::env::var("REQUIRE_POSTGRES").is_ok() {
+        assert!(
+            url.starts_with("postgres"),
+            "REQUIRE_POSTGRES is set but TEST_DATABASE_URL is {url:?}; this job would have tested SQLite"
+        );
+    }
+
     if !url.starts_with("postgres") {
         return; // Default SQLite run: nothing to prove.
     }
