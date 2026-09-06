@@ -38,6 +38,8 @@ deepen the understanding of the subject for both participants.
   ([why JS bloat matters](https://tonsky.me/blog/js-bloat),
   [why HTMX helps](https://www.reddit.com/r/htmx/comments/1bg621p/comment/kv7oo6i))
 - **Tailwind** — CSS styling.
+- **sqlx** — accounts stored in SQLite or Postgres, selected at runtime.
+- **tower-sessions + Argon2** — cookie sessions and password hashing.
 
 ## Deployment
 
@@ -53,17 +55,18 @@ This section tracks the proposal against the code. See the
 
 | Proposal element | Where it lives | Status |
 | --- | --- | --- |
-| Users list skills they can offer | `Member.teaching` in `src/models.rs` | Built |
-| Users list skills they want | `Member.learning` in `src/models.rs` | Built |
+| Users list skills they can offer | `User.teaching` in `src/models.rs` | Built |
+| Users list skills they want | `User.learning` in `src/models.rs` | Built |
 | Organized matching system | `Swap::between` in `src/models.rs` | Built |
 | Mutually beneficial exchange | Matching requires overlap in **both** directions | Built |
 | Search instead of trawling forums | `/browse` with live HTMX search | Built |
 | Reduced client-side JavaScript | HTMX only; no bundler, no framework | Built |
 | Easy local testing | `cargo run` plus one Tailwind script | Built |
 | GitHub Actions | `.github/workflows/ci.yml` | Built |
-| Accounts and profiles owned by a user | — | Not started |
+| Accounts and profiles owned by a user | `src/auth.rs`, `src/routes/auth.rs` | Built |
 | Contacting or scheduling with a match | — | Not started |
-| Durable storage | `Store` is in-memory; the seam for a database is in place | Not started |
+| Durable storage | `src/store.rs` over SQLite or Postgres | Built |
+| Editing a profile after signup | — | Not started |
 
 The design decision worth calling out: a match is only shown when the exchange
 works both ways. A user who could teach you something but wants nothing you offer

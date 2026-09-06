@@ -13,3 +13,8 @@
 .idea/
 .vscode/
 *.swp
+
+# Local SQLite database created on first run
+/learnswap.db
+/learnswap.db-shm
+/learnswap.db-wal

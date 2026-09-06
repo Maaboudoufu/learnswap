@@ -5,19 +5,24 @@ use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
 use minijinja::context;
 
+use crate::auth::AuthUserId;
 use crate::error::AppError;
 use crate::state::AppState;
 use crate::templates::render;
 
-pub async fn index(State(state): State<AppState>) -> Result<Response, AppError> {
+pub async fn index(
+    State(state): State<AppState>,
+    current_user: Option<AuthUserId>,
+) -> Result<Response, AppError> {
     let store = state.store();
-    let featured = store.featured_swaps(3);
+    let featured = store.featured_swaps(3).await?;
     let page = render(
         state.templates(),
         "pages/index.html",
         context! {
-            member_count => store.count(),
-            skill_count => store.distinct_skill_count(),
+            member_count => store.count().await?,
+            skill_count => store.distinct_skill_count().await?,
+            current_user_id => current_user.map(|u| u.0.to_string()),
             featured => featured
                 .iter()
                 .map(|(viewer, swap)| context! {

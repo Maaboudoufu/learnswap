@@ -1,7 +1,7 @@
 //! Core domain types for LearnSwap.
 //!
-//! A member offers some skills (`teaching`) and wants some others (`learning`).
-//! A *swap* is a pair of members where each side can teach something the other
+//! A user offers some skills (`teaching`) and wants some others (`learning`).
+//! A *swap* is a pair of users where each side can teach something the other
 //! side wants to learn -- that mutual requirement is what separates LearnSwap
 //! from a one-way tutoring listing.
 
@@ -38,11 +38,27 @@ impl Skill {
         }
         out
     }
+
+    /// Renders tags back to the comma-separated form stored in the database.
+    pub fn join(skills: &[Skill]) -> String {
+        skills
+            .iter()
+            .map(|s| s.label.as_str())
+            .collect::<Vec<_>>()
+            .join(", ")
+    }
 }
 
+/// A member of the site. Deliberately carries no credentials: this is the type
+/// that gets handed to templates, and a password hash must never end up in a
+/// rendered page. The hash stays inside `store`.
 #[derive(Debug, Clone, Serialize)]
-pub struct Member {
+pub struct User {
     pub id: Uuid,
+    /// Not serialized -- an email address is contact information, and nothing
+    /// public should leak it just because a template interpolated a whole user.
+    #[serde(skip_serializing)]
+    pub email: String,
     pub name: String,
     pub headline: String,
     pub bio: String,
@@ -50,20 +66,9 @@ pub struct Member {
     pub learning: Vec<Skill>,
 }
 
-impl Member {
-    pub fn new(name: &str, headline: &str, bio: &str, teaching: &str, learning: &str) -> Self {
-        Self {
-            id: Uuid::new_v4(),
-            name: name.trim().to_string(),
-            headline: headline.trim().to_string(),
-            bio: bio.trim().to_string(),
-            teaching: Skill::parse_list(teaching),
-            learning: Skill::parse_list(learning),
-        }
-    }
-
-    /// Skills this member can teach that `other` wants to learn.
-    fn can_teach(&self, other: &Member) -> Vec<Skill> {
+impl User {
+    /// Skills this user can teach that `other` wants to learn.
+    fn can_teach(&self, other: &User) -> Vec<Skill> {
         self.teaching
             .iter()
             .filter(|s| other.learning.iter().any(|w| w.key == s.key))
@@ -86,10 +91,10 @@ impl Member {
     }
 }
 
-/// A viable two-way exchange between the member being viewed and a candidate.
+/// A viable two-way exchange between the user being viewed and a candidate.
 #[derive(Debug, Clone, Serialize)]
 pub struct Swap {
-    pub member: Member,
+    pub member: User,
     /// What the candidate would teach the viewer.
     pub they_teach: Vec<Skill>,
     /// What the viewer would teach the candidate.
@@ -98,7 +103,7 @@ pub struct Swap {
 
 impl Swap {
     /// Builds a swap only if the exchange works in *both* directions.
-    pub fn between(viewer: &Member, candidate: &Member) -> Option<Swap> {
+    pub fn between(viewer: &User, candidate: &User) -> Option<Swap> {
         if viewer.id == candidate.id {
             return None;
         }
@@ -114,7 +119,7 @@ impl Swap {
         })
     }
 
-    /// Ranking score: how much the two members have to trade.
+    /// Ranking score: how much the two users have to trade.
     pub fn strength(&self) -> usize {
         self.they_teach.len() + self.you_teach.len()
     }

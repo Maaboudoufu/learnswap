@@ -40,6 +40,41 @@ jobs:
       - name: Release build
         run: cargo build --release
 
+  postgres:
+    name: Test against Postgres
+    runs-on: ubuntu-latest
+    # The app supports SQLite and Postgres through sqlx's Any driver. The unit
+    # tests cover the SQL we generate for each; this job proves the Postgres
+    # half actually runs against a real server.
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: learnswap
+          POSTGRES_PASSWORD: learnswap
+          POSTGRES_DB: learnswap_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache cargo build
+        uses: Swatinem/rust-cache@v2
+
+      # Every test shares the one database, so they cannot run in parallel.
+      - name: Test
+        env:
+          TEST_DATABASE_URL: postgres://learnswap:learnswap@localhost:5432/learnswap_test
+        run: cargo test --test routes -- --test-threads=1
+
   css:
     name: Tailwind build
     runs-on: ubuntu-latest

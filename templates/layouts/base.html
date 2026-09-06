@@ -19,7 +19,17 @@
         </a>
         <div class="flex items-center gap-1 text-sm font-medium">
           <a href="/browse" class="rounded-md px-3 py-2 text-slate-600 hover:bg-slate-100 hover:text-slate-900">Browse</a>
-          <a href="/join" class="rounded-md bg-indigo-600 px-3 py-2 text-white hover:bg-indigo-700">Join</a>
+          {% if current_user_id %}
+            <a href="/members/{{ current_user_id }}" class="rounded-md px-3 py-2 text-slate-600 hover:bg-slate-100 hover:text-slate-900">My profile</a>
+            <form action="/logout" method="post" class="inline">
+              <button type="submit" class="rounded-md px-3 py-2 text-slate-600 hover:bg-slate-100 hover:text-slate-900">
+                Log out
+              </button>
+            </form>
+          {% else %}
+            <a href="/login" class="rounded-md px-3 py-2 text-slate-600 hover:bg-slate-100 hover:text-slate-900">Log in</a>
+            <a href="/register" class="rounded-md bg-indigo-600 px-3 py-2 text-white hover:bg-indigo-700">Join</a>
+          {% endif %}
         </div>
       </nav>
     </header>

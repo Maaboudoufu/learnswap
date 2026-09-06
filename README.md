@@ -38,11 +38,34 @@ cd cmpe131_project
 cargo run
 ```
 
-Then open <http://localhost:3000>. The app starts with five sample members so
-there is something to click on immediately.
+Then open <http://localhost:3000>. On first run it creates `learnswap.db` and
+seeds five sample members, so there is something to click on immediately.
+
+**Log in as any of them** with their `@example.edu` address and the password
+`learnswap` (printed in the startup log): `ana@example.edu`, `marcus@example.edu`,
+`priya@example.edu`, `tom@example.edu`, `lena@example.edu`.
 
 Set `PORT` if 3000 is taken: `PORT=4000 cargo run` (PowerShell:
 `$env:PORT=4000; cargo run`).
+
+### Database
+
+`DATABASE_URL` picks the backend at runtime. Unset, it defaults to a local
+SQLite file, which is what you want for coursework:
+
+```bash
+# SQLite (default) — a file in the repo root, git-ignored
+DATABASE_URL="sqlite://learnswap.db?mode=rwc" cargo run
+
+# Postgres — same code, same schema
+DATABASE_URL="postgres://user:pass@localhost/learnswap" cargo run
+```
+
+Migrations in `migrations/` run automatically on startup, so there is no
+separate setup step. To start over, delete `learnswap.db` and run again.
+
+Seeding only happens when the table is empty, so restarting never duplicates
+members and never overwrites an account you created.
 
 ### While you are working
 
@@ -71,6 +94,8 @@ changes to `.rs` files need `cargo run` again.
 | **[MiniJinja](https://docs.rs/minijinja)** | HTML templates with Jinja syntax. Whoever is doing front-end work writes HTML, not Rust. |
 | **[HTMX](https://htmx.org)** | Server-side rendering with live updates. The server sends finished HTML and HTMX swaps it into the page. |
 | **[Tailwind](https://tailwindcss.com) (standalone CLI)** | Styling via utility classes in the markup. |
+| **[sqlx](https://docs.rs/sqlx)** | Accounts in SQLite or Postgres, picked at runtime from `DATABASE_URL`. |
+| **[tower-sessions](https://docs.rs/tower-sessions) + [argon2](https://docs.rs/argon2)** | Cookie sessions and password hashing. |
 
 The HTMX choice is what keeps the front-end simple: there is no JavaScript
 bundle, no build step for the app itself, and no client-side state to keep in
@@ -91,8 +116,10 @@ debugging much easier, because you can hit any URL directly in a browser.
 src/
   main.rs        Startup: logging, port, bind, serve.
   lib.rs         Module list. Tests import the app through here.
-  models.rs      Member, Skill, Swap — including the two-way matching rule.
-  store.rs       Where members live. The ONLY module that knows about storage.
+  models.rs      User, Skill, Swap — including the two-way matching rule.
+  store.rs       Every SQL query. The ONLY module that knows about storage.
+  db.rs          Pool setup, migrations, and the one SQLite/Postgres difference.
+  auth.rs        Argon2 hashing and the "who is logged in?" extractor.
   state.rs       Shared state handed to every handler.
   templates.rs   MiniJinja setup and the render() helper.
   htmx.rs        HxRequest extractor: "did this come from HTMX?"
@@ -100,7 +127,8 @@ src/
   routes/
     mod.rs       The route table. Start here to find a handler.
     pages.rs     Landing page, health check, 404.
-    members.rs   Browse, search, profile, join.
+    members.rs   Browse, search, profile.
+    auth.rs      Register, log in, log out.
 
 templates/
   layouts/base.html    Page shell: nav, footer, <head>.
@@ -108,6 +136,7 @@ templates/
   partials/            Fragments HTMX swaps in. Also included by pages.
   macros.html          Reusable bits (skill pills, member cards).
 
+migrations/            SQL schema, applied automatically on startup.
 assets/css/input.css   Tailwind source. app.css is generated — do not edit it.
 scripts/               Tailwind build scripts.
 tests/routes.rs        End-to-end tests against the real router.
@@ -136,7 +165,15 @@ cargo test
 The tests in `tests/routes.rs` build the real router and send real requests
 through it in-process — no server to start, no browser, runs in milliseconds.
 They cover routing, template rendering, search, the matching rule, form
-validation and the HTMX-vs-plain-request split.
+validation, registration, login, and the HTMX-vs-plain-request split. Each test
+gets its own migrated in-memory SQLite database.
+
+To run them against Postgres instead — the tests share one database, so they
+cannot run in parallel:
+
+```bash
+TEST_DATABASE_URL="postgres://user:pass@localhost/learnswap_test"   cargo test --test routes -- --test-threads=1
+```
 
 Before pushing, run what CI runs:
 
@@ -152,6 +189,9 @@ cargo test
 `main` and every pull request:
 
 - **rust** — formatting check, Clippy with warnings denied, tests, release build.
+- **postgres** — runs the same test suite against a real Postgres 16 service
+  container. The SQLite path is covered by the `rust` job; this one proves the
+  Postgres half of the `Any` driver actually works.
 - **css** — builds the stylesheet and fails if it comes out suspiciously small,
   which is what happens when the `@source` globs in `assets/css/input.css` stop
   matching the templates.
@@ -160,7 +200,7 @@ Both must pass before a pull request is merged.
 
 ## Generated files
 
-`assets/css/app.css` and `.tailwind/` are git-ignored. `app.css` is built from
+`assets/css/app.css`, `.tailwind/` and `learnswap.db` are git-ignored. `app.css` is built from
 `assets/css/input.css`; committing it would produce a merge conflict in
 machine-generated output every time two people touch a template. Run the
 Tailwind script after pulling if styles look wrong.
@@ -171,11 +211,13 @@ Tailwind script after pulling if styles look wrong.
 
 These are open and deliberately not built:
 
-- **Persistence.** Members are held in memory and disappear on restart. All
-  storage goes through `Store` in `src/store.rs`, so adding SQLite (via `sqlx`)
-  means reimplementing that one type — no handler changes.
-- **Accounts and authentication.** Anyone can create a profile; there are no
-  logins and no way to edit or delete one.
+- **Editing your profile.** You can register and log in, but not change your
+  skills afterwards — you would have to register again.
+- **Password reset.** No email is sent anywhere, so a forgotten password means a
+  new account.
+- **Session storage.** Sessions live in memory, so restarting the server signs
+  everyone out and a second instance would not share them. `tower-sessions-sqlx-store`
+  can use the pool we already have when that matters.
 - **Contacting a match.** Profiles show who you could swap with, but there is no
   messaging or scheduling yet.
 - **Ranking.** Matches are sorted by how many skills are in play. Location,
