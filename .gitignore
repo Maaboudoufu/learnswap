@@ -1,0 +1,15 @@
+# Rust build output
+/target
+
+# Tailwind standalone binary, downloaded on demand by scripts/tailwind.*
+/.tailwind
+
+# Generated stylesheet. Built from assets/css/input.css -- never edit or commit
+# it, or every teammate gets a merge conflict on a machine-generated file.
+/assets/css/app.css
+
+# Editor and OS noise
+.DS_Store
+.idea/
+.vscode/
+*.swp

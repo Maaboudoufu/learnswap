@@ -1,0 +1,58 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# Cancel an in-progress run when new commits land on the same branch.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  rust:
+    name: Build, lint and test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      - name: Cache cargo build
+        uses: Swatinem/rust-cache@v2
+
+      - name: Check formatting
+        run: cargo fmt --all --check
+
+      - name: Lint
+        run: cargo clippy --all-targets -- --deny warnings
+
+      - name: Test
+        run: cargo test --all-targets
+
+      - name: Release build
+        run: cargo build --release
+
+  css:
+    name: Tailwind build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build stylesheet
+        run: ./scripts/tailwind.sh
+
+      # A stylesheet that built but produced almost nothing usually means the
+      # @source globs in assets/css/input.css stopped matching the templates.
+      - name: Check the stylesheet is not empty
+        run: |
+          size=$(wc -c < assets/css/app.css)
+          echo "app.css is ${size} bytes"
+          test "$size" -gt 1000

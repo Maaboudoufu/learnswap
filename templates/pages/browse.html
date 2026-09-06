@@ -1,0 +1,39 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Browse members &mdash; LearnSwap{% endblock %}
+
+{% block content %}
+  <h1 class="text-2xl font-bold tracking-tight text-slate-900">Browse members</h1>
+  <p class="mt-1 text-slate-600">Search by name or by any skill someone teaches or wants.</p>
+
+  <form class="mt-6" action="/browse" method="get" role="search">
+    <label for="q" class="sr-only">Search members</label>
+    <div class="relative">
+      <input
+        type="search"
+        id="q"
+        name="q"
+        value="{{ query }}"
+        placeholder="Try &quot;pottery&quot;, &quot;Spanish&quot; or a name"
+        autocomplete="off"
+        class="w-full rounded-lg border border-slate-300 bg-white px-4 py-3 pr-28 text-slate-900 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+        hx-get="/browse/results"
+        hx-trigger="input changed delay:250ms, search"
+        hx-target="#results"
+        hx-indicator="#search-status"
+        hx-push-url="true"
+      />
+      <span id="search-status" class="htmx-indicator absolute right-24 top-1/2 -translate-y-1/2 text-xs text-slate-400">
+        searching&hellip;
+      </span>
+      <!-- Submit button keeps the page usable with JavaScript disabled. -->
+      <button type="submit" class="absolute right-2 top-1/2 -translate-y-1/2 rounded-md bg-slate-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-slate-700">
+        Search
+      </button>
+    </div>
+  </form>
+
+  <div id="results" class="mt-8">
+    {% include "partials/member_list.html" %}
+  </div>
+{% endblock %}

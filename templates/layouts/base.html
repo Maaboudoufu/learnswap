@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en" class="h-full">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{% block title %}LearnSwap{% endblock %}</title>
+    <meta
+      name="description"
+      content="LearnSwap pairs people who can teach each other. Offer a skill, ask for one, and trade."
+    />
+    <link rel="stylesheet" href="/assets/css/app.css" />
+    <script src="https://unpkg.com/htmx.org@2.0.4/dist/htmx.min.js" defer></script>
+  </head>
+  <body class="flex min-h-full flex-col bg-slate-50 text-slate-800 antialiased">
+    <header class="border-b border-slate-200 bg-white">
+      <nav class="mx-auto flex max-w-5xl items-center justify-between px-4 py-4">
+        <a href="/" class="text-lg font-bold tracking-tight text-slate-900">
+          Learn<span class="text-indigo-600">Swap</span>
+        </a>
+        <div class="flex items-center gap-1 text-sm font-medium">
+          <a href="/browse" class="rounded-md px-3 py-2 text-slate-600 hover:bg-slate-100 hover:text-slate-900">Browse</a>
+          <a href="/join" class="rounded-md bg-indigo-600 px-3 py-2 text-white hover:bg-indigo-700">Join</a>
+        </div>
+      </nav>
+    </header>
+
+    <main class="mx-auto w-full max-w-5xl flex-1 px-4 py-10">
+      {% block content %}{% endblock %}
+    </main>
+
+    <footer class="border-t border-slate-200 bg-white">
+      <div class="mx-auto max-w-5xl px-4 py-6 text-sm text-slate-500">
+        LearnSwap &middot; CMPE 131 course project
+      </div>
+    </footer>
+  </body>
+</html>

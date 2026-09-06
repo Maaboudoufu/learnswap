@@ -1,0 +1,16 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Not found &mdash; LearnSwap{% endblock %}
+
+{% block content %}
+  <div class="py-16 text-center">
+    <p class="text-sm font-semibold text-indigo-600">404</p>
+    <h1 class="mt-2 text-3xl font-bold tracking-tight text-slate-900">We could not find that page.</h1>
+    <p class="mx-auto mt-3 max-w-md text-slate-600">
+      The profile may have been removed, or the link may be wrong.
+    </p>
+    <a href="/browse" class="mt-6 inline-block rounded-lg bg-indigo-600 px-5 py-3 text-sm font-semibold text-white hover:bg-indigo-700">
+      Browse members
+    </a>
+  </div>
+{% endblock %}

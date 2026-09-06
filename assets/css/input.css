@@ -1,0 +1,17 @@
+@import "tailwindcss";
+
+/* Tailwind v4 scans these paths for class names. Add any new template
+   directory here or its classes will be stripped from the built CSS. */
+@source "../../templates";
+@source "../../src";
+
+/* HTMX toggles this class on elements marked hx-indicator while a request is
+   in flight. Without it the "searching..." label would always be visible. */
+.htmx-indicator {
+  opacity: 0;
+  transition: opacity 150ms ease-in;
+}
+.htmx-request .htmx-indicator,
+.htmx-request.htmx-indicator {
+  opacity: 1;
+}

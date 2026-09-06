@@ -1,0 +1,22 @@
+[package]
+name = "learnswap"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.85"
+description = "LearnSwap - a peer skill exchange platform (CMPE 131 course project)."
+publish = false
+
+[dependencies]
+axum = "0.8.9"
+minijinja = { version = "2.24.0", features = ["loader"] }
+minijinja-autoreload = "2.24.0"
+serde = { version = "1.0.229", features = ["derive"] }
+tokio = { version = "1.53.1", features = ["full"] }
+tower-http = { version = "0.7.1", features = ["fs", "trace"] }
+tracing = "0.1.44"
+tracing-subscriber = { version = "0.3.23", features = ["env-filter"] }
+uuid = { version = "1.26.0", features = ["v4", "serde"] }
+
+[dev-dependencies]
+http-body-util = "0.1.5"
+tower = { version = "0.5.3", features = ["util"] }

@@ -1,0 +1,16 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Join &mdash; LearnSwap{% endblock %}
+
+{% block content %}
+  <h1 class="text-2xl font-bold tracking-tight text-slate-900">Add your skills</h1>
+  <p class="mt-1 max-w-2xl text-slate-600">
+    List at least one skill in each direction. Matching only works when the trade
+    goes both ways, so the &ldquo;want to learn&rdquo; side matters as much as what
+    you can offer.
+  </p>
+
+  <div class="max-w-2xl">
+    {% include "partials/join_form.html" %}
+  </div>
+{% endblock %}
