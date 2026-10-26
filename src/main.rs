@@ -14,7 +14,7 @@ async fn main() {
     // axum http handlers
     let app = Router::new()
         .route("/", get(routes::pages::pages))
-        // .route("/publish", post(handlers::post::post))
+        .route("/health", get(routes::health::health))
         .with_state(env);
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
