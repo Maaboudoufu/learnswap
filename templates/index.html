@@ -1,3 +1,284 @@
-<div>
-  <h1>Hello!</h1>
-</div>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LearnSwap</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+    <!-- Google Fonts: Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100">
+
+    <!-- Navigation Bar -->
+    <nav class="bg-[#142443] shadow-lg px-8 py-5 flex justify-between items-center">
+
+        <!-- LearnSwap Logo -->
+        <h1 class="text-3xl font-black tracking-tight">
+            <span class="text-white">Learn</span><span class="text-[#60A5FA]">Swap</span>
+        </h1>
+
+        <!-- Navigation Links -->
+        <div class="flex gap-8 items-center">
+
+            <a href="#" class="text-white hover:text-[#60A5FA] transition-colors">
+                Home
+            </a>
+
+            <a href="#" class="text-white hover:text-[#60A5FA] transition-colors">
+                About
+            </a>
+
+            <a href="#" class="text-white hover:text-[#60A5FA] transition-colors">
+                Login
+            </a>
+
+            <a href="#" class="bg-[#3B82F6] text-white px-6 py-2 rounded-lg hover:bg-[#2563EB] transition-colors">
+                Sign Up
+            </a>
+
+        </div>
+    </nav>
+
+
+    <!-- Hero Section -->
+    <section class="bg-[#F8FAFF] min-h-[500px] px-8 md:px-16 lg:px-24 py-20">
+
+        <!-- Two-column layout -->
+        <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+
+            <!-- LEFT SIDE: Text Content -->
+            <div class="max-w-3xl">
+
+                <!-- Small Label -->
+                <div class="inline-block bg-[#E3EEFF] text-[#3B82F6] text-sm font-semibold px-4 py-2 rounded-full mb-6">
+                    Share &nbsp;•&nbsp; Learn &nbsp;•&nbsp; Grow Together
+                </div>
+
+                <!-- Main Heading -->
+                <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight text-[#142443]">
+
+                    Exchange Knowledge,<br>
+
+                    <span class="text-[#3B82F6]">Empower</span>
+                    Each Other
+
+                </h1>
+
+                <!-- Description -->
+                <p class="mt-6 text-lg text-[#64748B] leading-relaxed max-w-2xl">
+                    LearnSwap connects students who want to learn new skills
+                    and share what they know. Find a skill partner, exchange
+                    knowledge, and grow together.
+                </p>
+
+                <!-- Buttons -->
+                <div class="flex flex-wrap gap-4 mt-8">
+
+                    <!-- Get Started -->
+                    <a href="#"
+                       class="bg-[#3B82F6] text-white font-semibold px-8 py-3 rounded-lg hover:bg-[#2563EB] transition-all duration-200 shadow-sm">
+
+                        Get Started &rarr;
+
+                    </a>
+
+                    <!-- Learn More -->
+                    <a href="#how-it-works"
+                       class="bg-transparent border border-[#CBD5E1] text-[#142443] font-semibold px-8 py-3 rounded-lg hover:bg-[#E3EEFF] transition-all duration-200">
+
+                        Learn More
+
+                    </a>
+
+                </div>
+
+            </div>
+            <!-- END LEFT SIDE -->
+
+
+            <!-- RIGHT SIDE: Hero Illustration -->
+            <div class="flex justify-center items-center">
+
+                <img
+                    src="/static/images/learnswap-hero.png"
+                    alt="Two students exchanging skills"
+                    class="w-full max-w-[650px] h-auto object-contain"
+                >
+
+            </div>
+            <!-- END RIGHT SIDE -->
+
+        </div>
+        <!-- END GRID -->
+
+    </section>
+    <!-- END HERO SECTION -->
+
+
+    <!-- Features Section -->
+    <section class="bg-[#F5F8FF] px-8 md:px-16 lg:px-24 py-16">
+
+        <div class="max-w-7xl mx-auto">
+
+            <!-- Feature Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+                <!-- Find Your Match -->
+                <div class="bg-white p-6 rounded-xl shadow-md flex items-start gap-4">
+
+                    <div class="bg-[#DBEAFE] text-[#3B82F6] p-4 rounded-xl text-2xl">
+                        &#128269;
+                    </div>
+
+                    <div>
+                        <h3 class="font-bold text-[#142443] text-lg">
+                            Find Your Match
+                        </h3>
+
+                        <p class="text-[#64748B] text-sm mt-1">
+                            Connect with students who have the skills
+                            you want to learn.
+                        </p>
+                    </div>
+
+                </div>
+
+
+                <!-- Swap Skills -->
+                <div class="bg-white p-6 rounded-xl shadow-md flex items-start gap-4">
+
+                    <div class="bg-[#D1FAE5] text-[#10B981] p-4 rounded-xl text-2xl">
+                        &#128260;
+                    </div>
+
+                    <div>
+                        <h3 class="font-bold text-[#142443] text-lg">
+                            Swap Skills
+                        </h3>
+
+                        <p class="text-[#64748B] text-sm mt-1">
+                            Teach what you know and learn something
+                            new in return.
+                        </p>
+                    </div>
+
+                </div>
+
+
+                <!-- Grow Together -->
+                <div class="bg-white p-6 rounded-xl shadow-md flex items-start gap-4">
+
+                    <div class="bg-[#EDE9FE] text-[#7C3AED] p-4 rounded-xl text-2xl">
+                        &#129309;
+                    </div>
+
+                    <div>
+                        <h3 class="font-bold text-[#142443] text-lg">
+                            Grow Together
+                        </h3>
+
+                        <p class="text-[#64748B] text-sm mt-1">
+                            Build connections, share knowledge,
+                            and improve together.
+                        </p>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- How It Works -->
+            <div id="how-it-works" class="mt-20 text-center">
+
+                <h2 class="text-3xl font-extrabold text-[#142443]">
+                    How It Works
+                </h2>
+
+                <p class="text-[#64748B] mt-2">
+                    Start exchanging skills in just a few steps.
+                </p>
+
+                <!-- Steps -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-10 mt-12">
+
+                    <!-- Step 1 -->
+                    <div class="flex flex-col items-center">
+
+                        <div class="bg-[#DBEAFE] text-[#2563EB] w-12 h-12 rounded-full flex items-center justify-center font-bold text-xl">
+                            1
+                        </div>
+
+                        <h3 class="font-bold text-[#142443] mt-4">
+                            Create an Account
+                        </h3>
+
+                        <p class="text-[#64748B] text-sm mt-2">
+                            Sign up and list the skills you can teach
+                            and want to learn.
+                        </p>
+
+                    </div>
+
+
+                    <!-- Step 2 -->
+                    <div class="flex flex-col items-center">
+
+                        <div class="bg-[#DBEAFE] text-[#2563EB] w-12 h-12 rounded-full flex items-center justify-center font-bold text-xl">
+                            2
+                        </div>
+
+                        <h3 class="font-bold text-[#142443] mt-4">
+                            Find a Skill Partner
+                        </h3>
+
+                        <p class="text-[#64748B] text-sm mt-2">
+                            Browse students and find someone
+                            with matching interests.
+                        </p>
+
+                    </div>
+
+
+                    <!-- Step 3 -->
+                    <div class="flex flex-col items-center">
+
+                        <div class="bg-[#DBEAFE] text-[#2563EB] w-12 h-12 rounded-full flex items-center justify-center font-bold text-xl">
+                            3
+                        </div>
+
+                        <h3 class="font-bold text-[#142443] mt-4">
+                            Start Swapping
+                        </h3>
+
+                        <p class="text-[#64748B] text-sm mt-2">
+                            Connect, exchange skills, and
+                            learn from each other.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+</body>
+</html>
