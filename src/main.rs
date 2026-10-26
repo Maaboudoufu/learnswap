@@ -13,8 +13,8 @@ async fn main() {
     let env = Arc::new(env);
     // axum http handlers
     let app = Router::new()
-        .route("/", get(handlers::fetch::fetch))
-        .route("/publish", post(handlers::publish::publish))
+        .route("/", get(handlers::get::get))
+        .route("/publish", post(handlers::post::post))
         .with_state(env);
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
