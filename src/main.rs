@@ -7,7 +7,7 @@ use std::sync::Arc;
 async fn main() {
     // minijinja
     let mut env = Environment::new();
-    env.add_template("index.html", include_str!("../templates/index.html"))
+    env.add_template("index.html", include_str!("../templates/pages/index.html"))
         .unwrap();
     // arc mutli-thread
     let env = Arc::new(env);
