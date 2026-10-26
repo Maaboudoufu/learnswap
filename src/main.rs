@@ -1,5 +1,5 @@
-mod handlers;
-use axum::{Router, routing::get, routing::post};
+mod routes;
+use axum::{Router, routing::get};
 use minijinja::Environment;
 use std::sync::Arc;
 
@@ -13,8 +13,8 @@ async fn main() {
     let env = Arc::new(env);
     // axum http handlers
     let app = Router::new()
-        .route("/", get(handlers::get::get))
-        .route("/publish", post(handlers::post::post))
+        .route("/", get(routes::pages::pages))
+        // .route("/publish", post(handlers::post::post))
         .with_state(env);
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
