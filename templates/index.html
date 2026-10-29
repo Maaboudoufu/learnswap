@@ -1,284 +1,453 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LearnSwap</title>
+    <meta name="description" content="Trade an hour of what you know for an hour of what another student knows.">
 
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-
-    <!-- Google Fonts: Poppins -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap" rel="stylesheet">
 
     <style>
+        :root {
+            --board: #24429b;
+            --board-text: #cbd6f6;
+            --ink: #142443;
+            --ink-soft: #4e5a74;
+            --line: #e2e6ef;
+            --gold: #f4c542;
+            --mint: #bee3b5;
+            --pink: #f6c4d2;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; }
+
         body {
-            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            background: #fff;
+            color: var(--ink);
+            font-family: "Archivo", system-ui, sans-serif;
+            font-size: 1.0625rem;
+            line-height: 1.55;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        a { color: inherit; }
+
+        .wrap {
+            max-width: 76rem;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        :focus-visible { outline: 3px solid var(--board); outline-offset: 3px; }
+        .board :focus-visible { outline-color: var(--gold); }
+
+        /* Buttons */
+        .btn {
+            display: inline-block;
+            padding: 0.75rem 1.375rem;
+            border-radius: 6px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: background-color 120ms ease, transform 80ms ease-out;
+        }
+
+        .btn:active { transform: scale(0.97); }
+
+        .btn-gold { background: var(--gold); color: var(--ink); }
+        .btn-gold:hover { background: #f8d466; }
+
+        .btn-outline { color: #fff; box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, 0.45); }
+        .btn-outline:hover { background: rgba(255, 255, 255, 0.08); }
+
+        .btn-blue { background: var(--board); color: #fff; }
+        .btn-blue:hover { background: #1c3684; }
+
+        /* Board: header + hero share the blue */
+        .board {
+            background: var(--board);
+            color: #fff;
+            overflow: hidden;
+        }
+
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 4.5rem;
+        }
+
+        .logo {
+            font-size: 1.375rem;
+            font-weight: 800;
+            font-stretch: 112%;
+            letter-spacing: -0.01em;
+            text-decoration: none;
+        }
+
+        .topbar nav {
+            display: flex;
+            align-items: center;
+            gap: 1.75rem;
+            font-size: 0.9375rem;
+        }
+
+        .topbar nav a:not(.btn) {
+            color: var(--board-text);
+            text-decoration: none;
+        }
+
+        .topbar nav a:not(.btn):hover { color: #fff; }
+        .topbar .btn { padding: 0.5rem 1rem; }
+
+        .hero {
+            display: grid;
+            grid-template-columns: 1.15fr 1fr;
+            gap: 3rem;
+            align-items: center;
+            padding: 4rem 0 6rem;
+        }
+
+        h1, h2, .flyer-title, .step-num {
+            font-weight: 800;
+            font-stretch: 68%;
+            margin: 0;
+        }
+
+        h1 {
+            font-size: clamp(3.25rem, 6.4vw, 6rem);
+            line-height: 0.9;
+            letter-spacing: -0.01em;
+        }
+
+        h1 span { display: block; }
+
+        .lede {
+            max-width: 30rem;
+            margin: 1.75rem 0 0;
+            font-size: 1.1875rem;
+            color: var(--board-text);
+            text-wrap: pretty;
+        }
+
+        .actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-top: 2.25rem;
+        }
+
+        /* Flyers */
+        .flyers {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 15rem));
+            gap: 2rem 1.75rem;
+            justify-content: center;
+        }
+
+        .flyer {
+            --sheet: #fff;
+            position: relative;
+            color: var(--ink);
+            filter: drop-shadow(0 10px 14px rgba(8, 18, 48, 0.35));
+        }
+
+        .flyer:nth-child(1) { transform: rotate(-2.5deg); }
+        .flyer:nth-child(2) { transform: translateY(2.5rem) rotate(1.5deg); --sheet: var(--gold); }
+        .flyer:nth-child(3) { transform: rotate(1.75deg); --sheet: var(--mint); }
+        .flyer:nth-child(4) { transform: translateY(2.5rem) rotate(-1.5deg); --sheet: var(--pink); }
+
+        .tape {
+            position: absolute;
+            top: -0.75rem;
+            left: 50%;
+            width: 5rem;
+            height: 1.5rem;
+            transform: translateX(-50%) rotate(-3deg);
+            background: rgba(255, 251, 232, 0.6);
+            z-index: 1;
+        }
+
+        .flyer:nth-child(even) .tape { transform: translateX(-50%) rotate(4deg); }
+
+        .flyer-body {
+            background: var(--sheet);
+            padding: 1.375rem 1.125rem 1rem;
+        }
+
+        .flyer-body .flyer-title {
+            margin: 0;
+            font-size: 1.625rem;
+            line-height: 0.95;
+        }
+
+        .flyer-body p { margin: 0.5rem 0 0; font-size: 0.875rem; line-height: 1.4; }
+
+        .flyer-body .want {
+            margin-top: 0.875rem;
+            font-weight: 700;
+        }
+
+        .want small {
+            display: block;
+            font-weight: 400;
+            font-size: 0.75rem;
+            color: var(--ink-soft);
+        }
+
+        .tabs { display: flex; }
+
+        .tab {
+            flex: 1;
+            height: 6.5rem;
+            padding: 0.375rem 0;
+            border: 0;
+            border-top: 1.5px dashed rgba(20, 36, 67, 0.35);
+            border-left: 1.5px dashed rgba(20, 36, 67, 0.35);
+            background: var(--sheet);
+            color: var(--ink);
+            font: 600 0.6875rem/1 "Archivo", system-ui, sans-serif;
+            white-space: nowrap;
+            writing-mode: vertical-rl;
+            transform-origin: top center;
+            cursor: pointer;
+        }
+
+        .tab:first-child { border-left: 0; }
+        .tab.gone { visibility: hidden; }
+
+        /* How it works */
+        .steps-section { padding: 6rem 0 5rem; }
+
+        h2 {
+            font-size: clamp(2.5rem, 5vw, 3.75rem);
+            line-height: 0.95;
+        }
+
+        .steps {
+            list-style: none;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 3rem;
+            margin: 3.5rem 0 0;
+            padding: 0;
+        }
+
+        .step-num {
+            display: block;
+            font-size: 4.5rem;
+            line-height: 1;
+            color: var(--board);
+        }
+
+        .steps h3 {
+            margin: 0.75rem 0 0.375rem;
+            font-size: 1.25rem;
+            line-height: 1.25;
+        }
+
+        .steps p { margin: 0; max-width: 20rem; color: var(--ink-soft); }
+
+        /* Closing */
+        .closing {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1.5rem 3rem;
+            padding: 3.5rem 0 4.5rem;
+            border-top: 1px solid var(--line);
+        }
+
+        .closing h2 { font-size: clamp(2rem, 4vw, 2.75rem); }
+        .closing p { margin: 0.5rem 0 0; color: var(--ink-soft); }
+
+        footer {
+            padding: 1.5rem 0 2rem;
+            border-top: 1px solid var(--line);
+            color: var(--ink-soft);
+            font-size: 0.875rem;
+        }
+
+        @media (max-width: 900px) {
+            .hero { grid-template-columns: 1fr; gap: 3.5rem; padding: 2.5rem 0 5rem; }
+            .steps { grid-template-columns: 1fr; gap: 2.25rem; }
+            .steps-section { padding: 4.5rem 0 4rem; }
+        }
+
+        @media (max-width: 560px) {
+            .wrap { padding: 0 1rem; }
+            .topbar nav { gap: 1.25rem; }
+            .topbar .hide-sm { display: none; }
+            .flyers { gap: 1.5rem 1rem; }
+            .flyer-body .flyer-title { font-size: 1.3125rem; }
+            .flyer-body { padding: 1.125rem 0.875rem 0.875rem; }
+            .tab:nth-child(n+6) { display: none; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .btn { transition: none; }
+            .btn:active { transform: none; }
         }
     </style>
 </head>
 
-<body class="bg-gray-100">
+<body>
 
-    <!-- Navigation Bar -->
-    <nav class="bg-[#142443] shadow-lg px-8 py-5 flex justify-between items-center">
+    <div class="board">
+        <div class="wrap">
 
-        <!-- LearnSwap Logo -->
-        <h1 class="text-3xl font-black tracking-tight">
-            <span class="text-white">Learn</span><span class="text-[#60A5FA]">Swap</span>
-        </h1>
+            <header class="topbar">
+                <a href="/" class="logo">LearnSwap</a>
+                <nav>
+                    <a href="#how-it-works" class="hide-sm">How it works</a>
+                    <a href="#">Log in</a>
+                    <a href="#" class="btn btn-gold">Sign up</a>
+                </nav>
+            </header>
 
-        <!-- Navigation Links -->
-        <div class="flex gap-8 items-center">
+            <section class="hero">
+                <div>
+                    <h1><span>Teach calculus.</span><span>Learn guitar.</span></h1>
+                    <p class="lede">
+                        Or whatever you know, for whatever you want to learn.
+                        LearnSwap matches you with a student who wants to trade:
+                        an hour of your skill for an hour of theirs. Nobody pays.
+                    </p>
+                    <div class="actions">
+                        <a href="#" class="btn btn-gold">Sign up</a>
+                        <a href="#how-it-works" class="btn btn-outline">How it works</a>
+                    </div>
+                </div>
 
-            <a href="#" class="text-white hover:text-[#60A5FA] transition-colors">
-                Home
-            </a>
+                <div class="flyers">
+                    <article class="flyer">
+                        <span class="tape" aria-hidden="true"></span>
+                        <div class="flyer-body">
+                            <p class="flyer-title">Calculus II help</p>
+                            <p>Integrals, series, and exam prep. I've tutored it for two semesters.</p>
+                            <p class="want"><small>Looking for</small>Guitar lessons</p>
+                        </div>
+                        <div class="tabs" aria-hidden="true">
+                            <button class="tab gone" type="button" tabindex="-1">Calc ⇄ Guitar</button>
+                            <button class="tab" type="button" tabindex="-1">Calc ⇄ Guitar</button>
+                            <button class="tab gone" type="button" tabindex="-1">Calc ⇄ Guitar</button>
+                            <button class="tab" type="button" tabindex="-1">Calc ⇄ Guitar</button>
+                            <button class="tab" type="button" tabindex="-1">Calc ⇄ Guitar</button>
+                            <button class="tab" type="button" tabindex="-1">Calc ⇄ Guitar</button>
+                        </div>
+                    </article>
 
-            <a href="#" class="text-white hover:text-[#60A5FA] transition-colors">
-                About
-            </a>
+                    <article class="flyer">
+                        <span class="tape" aria-hidden="true"></span>
+                        <div class="flyer-body">
+                            <p class="flyer-title">Learn Figma</p>
+                            <p>From wireframes to a clickable prototype in a few sessions.</p>
+                            <p class="want"><small>Looking for</small>Resume feedback</p>
+                        </div>
+                        <div class="tabs" aria-hidden="true">
+                            <button class="tab" type="button" tabindex="-1">Figma ⇄ Resume</button>
+                            <button class="tab" type="button" tabindex="-1">Figma ⇄ Resume</button>
+                            <button class="tab" type="button" tabindex="-1">Figma ⇄ Resume</button>
+                            <button class="tab gone" type="button" tabindex="-1">Figma ⇄ Resume</button>
+                            <button class="tab" type="button" tabindex="-1">Figma ⇄ Resume</button>
+                            <button class="tab" type="button" tabindex="-1">Figma ⇄ Resume</button>
+                        </div>
+                    </article>
 
-            <a href="#" class="text-white hover:text-[#60A5FA] transition-colors">
-                Login
-            </a>
+                    <article class="flyer">
+                        <span class="tape" aria-hidden="true"></span>
+                        <div class="flyer-body">
+                            <p class="flyer-title">Spanish conversation</p>
+                            <p>Native speaker. Coffee and practice, no grammar drills.</p>
+                            <p class="want"><small>Looking for</small>Intro Python</p>
+                        </div>
+                        <div class="tabs" aria-hidden="true">
+                            <button class="tab" type="button" tabindex="-1">Spanish ⇄ Python</button>
+                            <button class="tab gone" type="button" tabindex="-1">Spanish ⇄ Python</button>
+                            <button class="tab gone" type="button" tabindex="-1">Spanish ⇄ Python</button>
+                            <button class="tab gone" type="button" tabindex="-1">Spanish ⇄ Python</button>
+                            <button class="tab" type="button" tabindex="-1">Spanish ⇄ Python</button>
+                            <button class="tab" type="button" tabindex="-1">Spanish ⇄ Python</button>
+                        </div>
+                    </article>
 
-            <a href="#" class="bg-[#3B82F6] text-white px-6 py-2 rounded-lg hover:bg-[#2563EB] transition-colors">
-                Sign Up
-            </a>
+                    <article class="flyer">
+                        <span class="tape" aria-hidden="true"></span>
+                        <div class="flyer-body">
+                            <p class="flyer-title">Film photography</p>
+                            <p>Shooting, then developing black-and-white in the darkroom.</p>
+                            <p class="want"><small>Looking for</small>Java help</p>
+                        </div>
+                        <div class="tabs" aria-hidden="true">
+                            <button class="tab" type="button" tabindex="-1">Film ⇄ Java</button>
+                            <button class="tab" type="button" tabindex="-1">Film ⇄ Java</button>
+                            <button class="tab" type="button" tabindex="-1">Film ⇄ Java</button>
+                            <button class="tab" type="button" tabindex="-1">Film ⇄ Java</button>
+                            <button class="tab" type="button" tabindex="-1">Film ⇄ Java</button>
+                            <button class="tab gone" type="button" tabindex="-1">Film ⇄ Java</button>
+                        </div>
+                    </article>
+                </div>
+            </section>
 
         </div>
-    </nav>
+    </div>
 
+    <main class="wrap">
 
-    <!-- Hero Section -->
-    <section class="bg-[#F8FAFF] min-h-[500px] px-8 md:px-16 lg:px-24 py-20">
+        <section id="how-it-works" class="steps-section">
+            <h2>How a swap works</h2>
+            <ol class="steps">
+                <li>
+                    <span class="step-num">1</span>
+                    <h3>Post what you can teach</h3>
+                    <p>List the skills you're good at and the ones you want to pick up.</p>
+                </li>
+                <li>
+                    <span class="step-num">2</span>
+                    <h3>Pick a swap</h3>
+                    <p>Find a student whose skills line up with yours and send a request.</p>
+                </li>
+                <li>
+                    <span class="step-num">3</span>
+                    <h3>Meet and trade</h3>
+                    <p>Agree on a time. Teach for an hour, then learn for an hour.</p>
+                </li>
+            </ol>
+        </section>
 
-        <!-- Two-column layout -->
-        <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-
-            <!-- LEFT SIDE: Text Content -->
-            <div class="max-w-3xl">
-
-                <!-- Small Label -->
-                <div class="inline-block bg-[#E3EEFF] text-[#3B82F6] text-sm font-semibold px-4 py-2 rounded-full mb-6">
-                    Share &nbsp;•&nbsp; Learn &nbsp;•&nbsp; Grow Together
-                </div>
-
-                <!-- Main Heading -->
-                <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight text-[#142443]">
-
-                    Exchange Knowledge,<br>
-
-                    <span class="text-[#3B82F6]">Empower</span>
-                    Each Other
-
-                </h1>
-
-                <!-- Description -->
-                <p class="mt-6 text-lg text-[#64748B] leading-relaxed max-w-2xl">
-                    LearnSwap connects students who want to learn new skills
-                    and share what they know. Find a skill partner, exchange
-                    knowledge, and grow together.
-                </p>
-
-                <!-- Buttons -->
-                <div class="flex flex-wrap gap-4 mt-8">
-
-                    <!-- Get Started -->
-                    <a href="#"
-                       class="bg-[#3B82F6] text-white font-semibold px-8 py-3 rounded-lg hover:bg-[#2563EB] transition-all duration-200 shadow-sm">
-
-                        Get Started &rarr;
-
-                    </a>
-
-                    <!-- Learn More -->
-                    <a href="#how-it-works"
-                       class="bg-transparent border border-[#CBD5E1] text-[#142443] font-semibold px-8 py-3 rounded-lg hover:bg-[#E3EEFF] transition-all duration-200">
-
-                        Learn More
-
-                    </a>
-
-                </div>
-
+        <section class="closing">
+            <div>
+                <h2>Have something to teach?</h2>
+                <p>Put up your first flyer. It takes about two minutes.</p>
             </div>
-            <!-- END LEFT SIDE -->
+            <a href="#" class="btn btn-blue">Sign up</a>
+        </section>
 
+    </main>
 
-            <!-- RIGHT SIDE: Hero Illustration -->
-            <div class="flex justify-center items-center">
+    <footer>
+        <div class="wrap">LearnSwap is a CMPE 131 class project.</div>
+    </footer>
 
-                <img
-                    src="/static/images/learnswap-hero.png"
-                    alt="Two students exchanging skills"
-                    class="w-full max-w-[650px] h-auto object-contain"
-                >
-
-            </div>
-            <!-- END RIGHT SIDE -->
-
-        </div>
-        <!-- END GRID -->
-
-    </section>
-    <!-- END HERO SECTION -->
-
-
-    <!-- Features Section -->
-    <section class="bg-[#F5F8FF] px-8 md:px-16 lg:px-24 py-16">
-
-        <div class="max-w-7xl mx-auto">
-
-            <!-- Feature Cards -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-
-                <!-- Find Your Match -->
-                <div class="bg-white p-6 rounded-xl shadow-md flex items-start gap-4">
-
-                    <div class="bg-[#DBEAFE] text-[#3B82F6] p-4 rounded-xl text-2xl">
-                        &#128269;
-                    </div>
-
-                    <div>
-                        <h3 class="font-bold text-[#142443] text-lg">
-                            Find Your Match
-                        </h3>
-
-                        <p class="text-[#64748B] text-sm mt-1">
-                            Connect with students who have the skills
-                            you want to learn.
-                        </p>
-                    </div>
-
-                </div>
-
-
-                <!-- Swap Skills -->
-                <div class="bg-white p-6 rounded-xl shadow-md flex items-start gap-4">
-
-                    <div class="bg-[#D1FAE5] text-[#10B981] p-4 rounded-xl text-2xl">
-                        &#128260;
-                    </div>
-
-                    <div>
-                        <h3 class="font-bold text-[#142443] text-lg">
-                            Swap Skills
-                        </h3>
-
-                        <p class="text-[#64748B] text-sm mt-1">
-                            Teach what you know and learn something
-                            new in return.
-                        </p>
-                    </div>
-
-                </div>
-
-
-                <!-- Grow Together -->
-                <div class="bg-white p-6 rounded-xl shadow-md flex items-start gap-4">
-
-                    <div class="bg-[#EDE9FE] text-[#7C3AED] p-4 rounded-xl text-2xl">
-                        &#129309;
-                    </div>
-
-                    <div>
-                        <h3 class="font-bold text-[#142443] text-lg">
-                            Grow Together
-                        </h3>
-
-                        <p class="text-[#64748B] text-sm mt-1">
-                            Build connections, share knowledge,
-                            and improve together.
-                        </p>
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <!-- How It Works -->
-            <div id="how-it-works" class="mt-20 text-center">
-
-                <h2 class="text-3xl font-extrabold text-[#142443]">
-                    How It Works
-                </h2>
-
-                <p class="text-[#64748B] mt-2">
-                    Start exchanging skills in just a few steps.
-                </p>
-
-                <!-- Steps -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-10 mt-12">
-
-                    <!-- Step 1 -->
-                    <div class="flex flex-col items-center">
-
-                        <div class="bg-[#DBEAFE] text-[#2563EB] w-12 h-12 rounded-full flex items-center justify-center font-bold text-xl">
-                            1
-                        </div>
-
-                        <h3 class="font-bold text-[#142443] mt-4">
-                            Create an Account
-                        </h3>
-
-                        <p class="text-[#64748B] text-sm mt-2">
-                            Sign up and list the skills you can teach
-                            and want to learn.
-                        </p>
-
-                    </div>
-
-
-                    <!-- Step 2 -->
-                    <div class="flex flex-col items-center">
-
-                        <div class="bg-[#DBEAFE] text-[#2563EB] w-12 h-12 rounded-full flex items-center justify-center font-bold text-xl">
-                            2
-                        </div>
-
-                        <h3 class="font-bold text-[#142443] mt-4">
-                            Find a Skill Partner
-                        </h3>
-
-                        <p class="text-[#64748B] text-sm mt-2">
-                            Browse students and find someone
-                            with matching interests.
-                        </p>
-
-                    </div>
-
-
-                    <!-- Step 3 -->
-                    <div class="flex flex-col items-center">
-
-                        <div class="bg-[#DBEAFE] text-[#2563EB] w-12 h-12 rounded-full flex items-center justify-center font-bold text-xl">
-                            3
-                        </div>
-
-                        <h3 class="font-bold text-[#142443] mt-4">
-                            Start Swapping
-                        </h3>
-
-                        <p class="text-[#64748B] text-sm mt-2">
-                            Connect, exchange skills, and
-                            learn from each other.
-                        </p>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </section>
+    <script>
+        // Tear-off tabs: click one and it drops off the flyer
+        document.querySelectorAll(".tab").forEach(function (tab) {
+            tab.addEventListener("click", function () {
+                tab.disabled = true;
+                var reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+                var frames = reduce
+                    ? [ { opacity: 1 }, { opacity: 0 } ]
+                    : [ { transform: "none", opacity: 1 }, { transform: "translate(4px, 3.5rem) rotate(14deg)", opacity: 0 } ];
+                tab.animate(frames, { duration: reduce ? 150 : 450, easing: "cubic-bezier(0.5, 0, 0.75, 0)", fill: "forwards" })
+                    .onfinish = function () { tab.style.visibility = "hidden"; };
+            });
+        });
+    </script>
 
 </body>
 </html>
